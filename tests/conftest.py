@@ -46,12 +46,56 @@ _trans_mod = MagicMock()
 _trans_mod.TranslatorWrapper = MagicMock
 sys.modules["utils.translator"] = _trans_mod
 
+# Mock TikTokLive for test environment (pytest import machinery conflicts with real package)
+_tiktok_mock = MagicMock()
+_tiktok_mock.client = MagicMock()
+_tiktok_mock.client.client = MagicMock()
+_tiktok_mock.client.client.TikTokLiveClient = MagicMock
+_tiktok_mock.types = MagicMock()
+_tiktok_mock.types.events = MagicMock()
+_tiktok_mock.types.events.CommentEvent = MagicMock
+_tiktok_mock.types.events.ConnectEvent = MagicMock
+_tiktok_mock.types.events.DisconnectEvent = MagicMock
+_tiktok_mock.types.events.EmoteEvent = MagicMock
+_tiktok_mock.types.events.EnvelopeEvent = MagicMock
+_tiktok_mock.types.events.FollowEvent = MagicMock
+_tiktok_mock.types.events.GiftEvent = MagicMock
+_tiktok_mock.types.events.JoinEvent = MagicMock
+_tiktok_mock.types.events.LikeEvent = MagicMock
+_tiktok_mock.types.events.LiveEndEvent = MagicMock
+_tiktok_mock.types.events.ShareEvent = MagicMock
+_tiktok_mock.types.events.ViewerUpdateEvent = MagicMock
+sys.modules["TikTokLive"] = _tiktok_mock
+sys.modules["TikTokLive.client"] = _tiktok_mock.client
+sys.modules["TikTokLive.client.client"] = _tiktok_mock.client.client
+sys.modules["TikTokLive.types"] = _tiktok_mock.types
+sys.modules["TikTokLive.types.events"] = _tiktok_mock.types.events
+
 # Mock globals.data_store for test environment
 _data_store_mock = MagicMock()
 _data_store_mock.config = {}
 _data_store_mock.dst = ""
 _data_store_mock.divisa = "Por defecto"
 sys.modules["globals.data_store"] = _data_store_mock
+
+# Mock TikTokLive module (not installed in test environment)
+_tiktok_mock = MagicMock()
+_tiktok_mock.client = MagicMock()
+_tiktok_mock.client.client = MagicMock()
+_tiktok_mock.client.client.TikTokLiveClient = MagicMock
+sys.modules["TikTokLive"] = _tiktok_mock
+sys.modules["TikTokLive.client"] = _tiktok_mock.client
+sys.modules["TikTokLive.client.client"] = _tiktok_mock.client.client
+sys.modules["TikTokLive.events"] = MagicMock()
+
+# Mock kick module (not installed in test environment)
+# Use a proper mock module that doesn't interfere with pytest collection
+_kick_mock = MagicMock()
+_kick_mock.__path__ = []  # Make it look like a package
+_kick_mock.Client = MagicMock
+_kick_mock.Message = MagicMock
+_kick_mock.User = MagicMock
+sys.modules["kick"] = _kick_mock
 
 import pytest
 from servicios.estadisticas_manager import EstadisticasManager
@@ -72,6 +116,14 @@ def fake_chat_controller():
     cc.agregar_mensaje_donacion = MagicMock()
     cc.agregar_mensaje_evento = MagicMock()
     cc.chat_dialog = MagicMock()
+    # Add ui attribute with list boxes for handler tests
+    cc.ui = SimpleNamespace()
+    cc.ui.list_box_general = MagicMock()
+    cc.ui.list_box_miembros = MagicMock()
+    cc.ui.list_box_moderadores = MagicMock()
+    cc.ui.list_box_verificados = MagicMock()
+    cc.ui.list_box_donaciones = MagicMock()
+    cc.ui.list_box_eventos = MagicMock()
     return cc
 
 

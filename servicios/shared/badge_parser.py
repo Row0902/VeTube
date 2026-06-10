@@ -81,8 +81,12 @@ class BadgeParser:
 
             if badge_type == "moderator":
                 return "moderator"
+            if badge_type == "broadcaster":
+                return "moderator"
             if badge_type == "subscriber":
                 return "subscriber"
+            if badge_type == "verified":
+                return "verified"
 
         return "general"
 
